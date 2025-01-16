@@ -69,13 +69,17 @@ Step 4:- Writes the plaintext to the specified output file.
 
 ![Screenshot 2025-01-16 172249](https://github.com/user-attachments/assets/d7fc9d9a-8e03-4c50-a2b1-15cbdebf8db6)
 
+here, we can see that encrypted file is created.
+
 ![Screenshot 2025-01-16 172537](https://github.com/user-attachments/assets/0132ac54-93d6-455e-aced-050d87cf1894)
 
 In the above,  we can see that on opening the file , it will be open in encypted form which lead to not allow anyone to see the data  stored in the file.
 
+_____________________________________________________________________________________________________________________________________________________________________________________________
 
 **NOTE:-** To open this and get the data present in the file, we need to  decrypt the encrypted file with same pass key or password.
 
+_____________________________________________________________________________________________________________________________________________________________________________________________
 
 **Decryption Process:-**
 
@@ -88,6 +92,8 @@ here, we can see that decrypted file is created.
 On openinng the decrypted file, we can get the data present in the file
 
 ![Screenshot 2025-01-16 172605](https://github.com/user-attachments/assets/59f2a310-6046-43cc-a265-e24a3e72d442)
+
+
 
 **Incase of wrong password,**
 
