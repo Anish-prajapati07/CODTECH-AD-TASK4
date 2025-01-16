@@ -82,12 +82,15 @@ In the above,  we can see that on opening the file , it will be open in encypted
 ![Screenshot 2025-01-16 172642](https://github.com/user-attachments/assets/4e5f5333-f864-4b91-b1ab-f3e6ab30a608)
 
 here, we can see that decrypted file is created.
+
 ![Screenshot 2025-01-16 175824](https://github.com/user-attachments/assets/d6b4b2db-21cc-43d7-9397-a55f32187ac3)
 
 On openinng the decrypted file, we can get the data present in the file
+
 ![Screenshot 2025-01-16 172605](https://github.com/user-attachments/assets/59f2a310-6046-43cc-a265-e24a3e72d442)
 
 **Incase of wrong password,**
+
 ![Screenshot 2025-01-16 172809](https://github.com/user-attachments/assets/7a37b0b8-18bc-4503-ad2c-4bcf3dd54130)
 
 
