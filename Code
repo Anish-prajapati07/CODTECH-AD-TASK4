@@ -1,0 +1,104 @@
+import os
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.padding import PKCS7
+from base64 import urlsafe_b64encode, urlsafe_b64decode
+from getpass import getpass
+
+class AES256FileEncryptor:
+    """
+    A robust file encryption and decryption tool using AES-256.
+    """
+
+    def __init__(self, password: str, salt: bytes = None):
+        self.backend = default_backend()
+        self.salt = salt if salt else os.urandom(16)
+        self.key = self._derive_key(password, self.salt)
+
+    def _derive_key(self, password: str, salt: bytes):
+        """
+        Derive a 256-bit AES key from a password and a salt using PBKDF2-HMAC.
+        """
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=salt,
+            iterations=100_000,
+            backend=self.backend,
+        )
+        return kdf.derive(password.encode())
+
+    def encrypt_file(self, input_file: str, output_file: str):
+        """
+        Encrypt the given file using AES-256 in CBC mode.
+        """
+        iv = os.urandom(16)  # Initialization Vector
+        cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv), backend=self.backend)
+        encryptor = cipher.encryptor()
+        padder = PKCS7(algorithms.AES.block_size).padder()
+
+        with open(input_file, "rb") as f_in, open(output_file, "wb") as f_out:
+            f_out.write(self.salt)  # Write salt for decryption
+            f_out.write(iv)  # Write IV for decryption
+
+            while chunk := f_in.read(1024):
+                padded_chunk = padder.update(chunk)
+                f_out.write(encryptor.update(padded_chunk))
+
+            f_out.write(encryptor.update(padder.finalize()) + encryptor.finalize())
+
+        print(f"[+] File encrypted successfully: {output_file}")
+
+    def decrypt_file(self, input_file: str, output_file: str):
+        """
+        Decrypt the given file using AES-256 in CBC mode.
+        """
+        with open(input_file, "rb") as f_in:
+            self.salt = f_in.read(16)  # Read the salt
+            iv = f_in.read(16)  # Read the IV
+            self.key = self._derive_key(password, self.salt)
+
+            cipher = Cipher(algorithms.AES(self.key), modes.CBC(iv), backend=self.backend)
+            decryptor = cipher.decryptor()
+            unpadder = PKCS7(algorithms.AES.block_size).unpadder()
+
+            with open(output_file, "wb") as f_out:
+                while chunk := f_in.read(1024):
+                    decrypted_chunk = decryptor.update(chunk)
+                    f_out.write(unpadder.update(decrypted_chunk))
+
+                try:
+                    f_out.write(unpadder.finalize() + decryptor.finalize())
+                    print(f"[+] File decrypted successfully: {output_file}")
+                except ValueError:
+                    print("[-] Decryption failed. Incorrect password or corrupted file.")
+
+if __name__ == "__main__":
+    print("AES-256 File Encryption/Decryption Tool")
+    print("1. Encrypt File")
+    print("2. Decrypt File")
+    print("3. Exit")
+
+    while True:
+        choice = input("Select an option: ").strip()
+        if choice == "1":
+            input_file = input("Enter the path to the file to encrypt: ").strip()
+            output_file = input("Enter the path to save the encrypted file: ").strip()
+            password = getpass("Enter a strong password: ").strip()
+
+            encryptor = AES256FileEncryptor(password)
+            encryptor.encrypt_file(input_file, output_file)
+        elif choice == "2":
+            input_file = input("Enter the path to the file to decrypt: ").strip()
+            output_file = input("Enter the path to save the decrypted file: ").strip()
+            password = getpass("Enter the decryption password: ").strip()
+
+            encryptor = AES256FileEncryptor(password)
+            encryptor.decrypt_file(input_file, output_file)
+        elif choice == "3":
+            print("Exiting. Goodbye!")
+            break
+        else:
+            print("Invalid option. Please select again.")
